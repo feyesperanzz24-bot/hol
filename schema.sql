@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS contenidos (
   referencia TEXT,              -- referencia bíblica, o etiqueta "Día · Tema" en reflexiones
   categoria_id INTEGER REFERENCES categorias(id) ON DELETE SET NULL,
   imagen_url TEXT,
+  youtube_url TEXT,
   seo_titulo TEXT,
   seo_descripcion TEXT,
   estado TEXT NOT NULL DEFAULT 'borrador',  -- 'borrador' | 'programado' | 'publicado'
