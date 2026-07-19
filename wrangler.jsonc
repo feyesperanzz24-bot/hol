@@ -1,0 +1,69 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fe-y-esperanza",
+  "main": "src/index.js",
+  "compatibility_date": "2025-01-01",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Sirve los archivos estáticos del sitio (HTML, CSS, JS, imágenes) desde ./public.
+  //
+  // IMPORTANTE: "run_worker_first" está en true a propósito. Sin esto,
+  // Cloudflare sirve los archivos estáticos DIRECTAMENTE, sin pasar por
+  // nuestro Worker, para cualquier ruta que coincida con un archivo real.
+  // Como el panel de login necesita ejecutar código (verificar sesión,
+  // leer cookies, hablar con D1), el Worker debe ejecutarse siempre.
+  // Este es el motivo por el que el login no funcionaba antes: las rutas
+  // de /admin quedaban servidas como archivos estáticos y el Worker nunca
+  // llegaba a intervenir.
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "feyesperanza_db",
+      "database_id": "0607ce67-ff1b-4fd7-b60c-0b8d7fab7c54"
+    }
+  ],
+
+  "r2_buckets": [
+    {
+      "binding": "IMAGENES",
+      "bucket_name": "feyesperanza-imagenes"
+    }
+  ],
+
+  // Revisa cada 15 minutos si hay publicaciones programadas que ya deban
+  // pasar de "programado" a "publicado".
+  "triggers": {
+    "crons": ["*/15 * * * *"]
+  },
+
+  // ---------------------------------------------------------------------
+  // CREDENCIALES DEL PANEL DE ADMINISTRACIÓN
+  // ---------------------------------------------------------------------
+  // Usuario: admin   /   Contraseña: 123456
+  //
+  // Estos valores viven aquí (como "vars" normales) en lugar de como
+  // "wrangler secret" para que el login funcione de inmediato después de
+  // `npm install` + `npm run deploy`, sin pasos manuales adicionales.
+  //
+  // ⚠️ IMPORTANTE — "123456" es una contraseña débil y este archivo queda
+  // en texto plano (y probablemente en tu control de versiones). Esto es
+  // aceptable solo mientras pruebas o para un sitio de bajo riesgo. En
+  // cuanto puedas, cambia la contraseña así:
+  //   1) node scripts/hash-password.mjs "TuNuevaContraseñaSegura"
+  //   2) Reemplaza ADMIN_PASS_SALT y ADMIN_PASS_HASH abajo con los valores
+  //      que te imprima el script.
+  //   3) npm run deploy
+  // Sigue sin requerir "wrangler secret put".
+  "vars": {
+    "ADMIN_USER": "admin",
+    "ADMIN_PASS_SALT": "c5e5468959774347e268f6306378d764",
+    "ADMIN_PASS_HASH": "727d425ca3c688a9676d7242ffe3b7bcb8a7783c7116444cb2702c562bd339b0",
+    "SESSION_SECRET": "f3a5ffe98647e25d56ca12ac235f86c66236f5648b6b67e562a364be2cb2cb46"
+  }
+}

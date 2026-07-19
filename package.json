@@ -1,0 +1,19 @@
+{
+  "name": "fe-y-esperanza",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sitio Fe y Esperanza con panel de administración (Cloudflare Workers + D1 + R2)",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:init": "wrangler d1 execute feyesperanza_db --remote --file=./schema.sql",
+    "db:init:local": "wrangler d1 execute feyesperanza_db --local --file=./schema.sql",
+    "hash-password": "node scripts/hash-password.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  },
+  "dependencies": {
+    "hono": "^4.6.0"
+  }
+}
